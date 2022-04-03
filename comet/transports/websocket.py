@@ -10,8 +10,14 @@ from comet.constants import (
     ConnectionType
 )
 
+from typing import (
+    final,
+    Optional,
+    Callable,
+    Awaitable
+)
+
 from functools import wraps
-from typing import final, Optional, Callable, Awaitable
 from aiohttp import ClientWebSocketResponse, ClientSession
 
 def bayeux_message(fn: Callable[..., Awaitable[Json]]) -> Callable[..., Awaitable[Json]]:
@@ -20,7 +26,7 @@ def bayeux_message(fn: Callable[..., Awaitable[Json]]) -> Callable[..., Awaitabl
     async def wrapper(self: 'WebSocketTransport', *args, **kwargs) -> Json:
         await fn(*args, **kwargs)
         data = await self._socket.recieve_json()
-        # Increment after complete handshake flow
+        # Increment id after complete request-response flow
         self.id += 1
         if (error := data.get("error")):
             raise BayeuxError(error)
@@ -42,30 +48,39 @@ class WebSocketTransport(Transport):
 
     @bayeux_message
     async def handshake(self, connection_types: list[ConnectionType]) -> Json:
-        await self._socket.send_json({
+        await self._socket.send_json([{
             "id": self.id,
             "channel": "/meta/handshake",
             "version": VERSION,
             "mininumVersion": VERSION,
             "supportedConnectionTypes": connection_types
-        })
+        }])
 
     @bayeux_message
     async def connect(self) -> Json:
-        await self._socket.send_json({
+        await self._socket.send_json([{
             "id": self.id,
             "channel": "/meta/connect",
             "connectionType": DEFAULT_CONNECTION_TYPE,
             "clientId": self.client_id
-        })
+        }])
 
     @bayeux_message
     async def disconnect(self) -> Json:
-        await self._socket.send_json({
+        await self._socket.send_json([{
             "id": self.id,
             "channel": "/meta/disconnect",
             "clientId": self.client_id
-        })
+        }])
+
+    @bayeax_message
+    async def subscribe(self, channel: str | list[str]) -> Json:
+        await self._socket.send_json([{
+            "channel": "/meta/subscribe",
+            "clientId": self.client_id,
+            "subscription": channel,
+            "id": self.id
+        }])
 
     async def close(self) -> None:
         await self._socket.close()

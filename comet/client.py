@@ -6,7 +6,10 @@ __all__ = (
 
 from . import constants
 from .typing import UrlOrStr
-from .transports import WebSocketTransport
+from .exceptions import HandshakeError
+from .models import HandshakeResponse
+
+from transports import Transport, WebSocketTransport
 
 from functools import wraps
 from aiohttp import ClientSession, ClientWebSocketResponse
@@ -28,8 +31,8 @@ class CometD(AbstractAsyncContextManager):
         '_transport',
     )
 
-    def __init__(self, transport: WebSocketTransport) -> None:
-        """ Requires websocket to be connected """
+    def __init__(self, transport: Transport) -> None:
+        """ Requires transport to be connected """
         self._transport = transport
 
     @classmethod
@@ -45,8 +48,9 @@ class CometD(AbstractAsyncContextManager):
         return cls.from_socket(socket)
 
     async def handshake(self) -> None:
-        data = await self._transport.handshake()
-        self._transport.client_id = data["client_id"]
+        response: HandshakeResponse = await self._transport.handshake()
+        if not (self._transport.client_id := response.get("client_id")):
+            raise HandshakeError("Invalid handshake response")
 
     @property
     def closed(self) -> bool:
