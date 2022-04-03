@@ -21,7 +21,7 @@ def bayeux_message(fn: Callable[..., Awaitable[Json]]) -> Callable[..., Awaitabl
         await fn(*args, **kwargs)
         data = await self._socket.recieve_json()
         # Increment after complete handshake flow
-        self._id += 1
+        self.id += 1
         if (error := data.get("error")):
             raise BayeuxError(error)
         return data
@@ -78,10 +78,14 @@ class WebSocketTransport(Transport):
     def id(self) -> int:
         return self._id
 
+    @id.setter
+    def id(self, value: int) -> None:
+        self._id = value
+
     @property
     def client_id(self) -> Optional[str]:
         return self._client_id
 
     @client_id.setter
-    def client_id(self, value: int) -> None:
+    def client_id(self, value: str) -> None:
         self._client_id = value
