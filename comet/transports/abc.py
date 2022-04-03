@@ -52,17 +52,17 @@ class Transport(ABC):
         """
 
     @abstractmethod
-    async def subscribe(self) -> Json:
+    async def subscribe(self, channel: str | list[str]) -> Json:
         """
         A connected Bayeux client may send subscribe messages to register interest in a channel and to request that messages published to that channel
         """
 
     @abstractmethod
-    async def unsubscribe(self) -> Json:
+    async def unsubscribe(self, subscription: str | list[str]) -> Json:
         """ Unsubscribe from server """
 
     @abstractmethod
-    async def publish(self) -> Json:
+    async def publish(self, channel: str, data: Json) -> Json:
         """
         A connected Bayeux client may send unsubscribe messages to cancel interest in a channel and to request that messages published to that channel are not delivered to itself.
         """
