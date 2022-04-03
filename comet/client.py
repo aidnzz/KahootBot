@@ -33,12 +33,16 @@ class CometD(AbstractAsyncContextManager):
         self._transport = transport
 
     @classmethod
+    def from_socket(cls: Type['CometD'], socket: ClientWebSocketResponse) -> 'CometD':
+        return cls(WebSocketTransport(socket))
+
+    @classmethod
     async def connect(cls: Type['CometD'], url: UrlOrStr, *, client: Optional[ClientSession] = None, **kwargs) -> 'CometD':
         """ Connect to cometd server via websocket  """
         cm = nullcontext(client) if client else ClientSession() # Client manager
         async with cm as client:
             socket = await client.ws_connect(url, **kwargs)
-        return cls(WebSocketTransport(socket))
+        return cls.from_socket(socket)
 
     async def handshake(self) -> None:
         data = await self._transport.handshake()
