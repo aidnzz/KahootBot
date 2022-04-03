@@ -73,7 +73,7 @@ class WebSocketTransport(Transport):
             "clientId": self.client_id
         }])
 
-    @bayeax_message
+    @bayeux_message
     async def subscribe(self, channel: str | list[str]) -> Json:
         await self._socket.send_json([{
             "channel": "/meta/subscribe",

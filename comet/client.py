@@ -9,16 +9,16 @@ from .typing import UrlOrStr
 from .exceptions import HandshakeError
 from .models import HandshakeResponse
 
-from transports import Transport, WebSocketTransport
+from .transports import Transport, WebSocketTransport
 
 from functools import wraps
 from aiohttp import ClientSession, ClientWebSocketResponse
 from contextlib import AbstractAsyncContextManager, nullcontext
 
 from typing import (
-    Callable, 
-    Optional, 
-    TypeVar, 
+    Callable,
+    Optional,
+    TypeVar,
     Type
 )
 
@@ -49,8 +49,7 @@ class CometD(AbstractAsyncContextManager):
 
     async def handshake(self) -> None:
         response: HandshakeResponse = await self._transport.handshake()
-        if not (self._transport.client_id := response.get("client_id")):
-            raise HandshakeError("Invalid handshake response")
+        self._transport.client_id = response["client_id"]
 
     @property
     def closed(self) -> bool:

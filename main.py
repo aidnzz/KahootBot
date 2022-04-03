@@ -14,7 +14,7 @@ async def message(data: Message) -> None:
 
 async def main() -> None:
     async with bot:
-        await bot.join(6598272, nickname="aidnzz")
+        await bot.join(5571732, nickname="aidnzz")
         await bot.run()
 
 if __name__ == "__main__":

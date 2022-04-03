@@ -9,7 +9,6 @@ from comet.constants import ConnectionType
 
 from abc import ABC, abstractmethod
 
-
 class Transport(ABC):
     @property
     @abstractmethod
@@ -18,7 +17,7 @@ class Transport(ABC):
 
     @id.setter
     @abstractmethod
-    def id(self, value: int) -> int:
+    def id(self, value: int) -> None:
         """ Set unique message id """
 
     @property

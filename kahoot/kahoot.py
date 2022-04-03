@@ -15,10 +15,10 @@ from aiohttp import ClientSession, ContentTypeError
 from contextlib import AbstractAsyncContextManager
 
 from typing import (
-    TypeVar, 
-    TypeAlias, 
-    Callable, 
-    Optional, 
+    TypeVar,
+    TypeAlias,
+    Callable,
+    Optional,
     Awaitable
 )
 
