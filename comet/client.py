@@ -37,7 +37,7 @@ class CometD(AbstractAsyncContextManager):
         """ Connect to cometd server via websocket  """
         cm = nullcontext(client) if client else ClientSession() # Client manager
         async with cm as client:
-            socket = await ClientSession.ws_connect(client, url, **kwargs)
+            socket = await client.ws_connect(url, **kwargs)
         return cls(WebSocketTransport(socket))
 
     async def handshake(self) -> None:
