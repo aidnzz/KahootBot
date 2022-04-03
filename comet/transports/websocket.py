@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+__all__ = (
+    'WebSocketTransport',
+)
+
 from comet.typing import UrlOrStr, Json
 from comet.exceptions import BayeuxError
 from comet.transports.abc import Transport
