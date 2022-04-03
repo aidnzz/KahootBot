@@ -10,10 +10,17 @@ from .exceptions import JoinError
 from .models import ReservationResponse
 
 from operator import itemgetter
-from contextlib import AbstractAsyncContextManager
 from functools import partial, wraps
-from typing import TypeVar, TypeAlias, Callable, Optional, Awaitable
 from aiohttp import ClientSession, ContentTypeError
+from contextlib import AbstractAsyncContextManager
+
+from typing import (
+    TypeVar, 
+    TypeAlias, 
+    Callable, 
+    Optional, 
+    Awaitable
+)
 
 KahootClient = partial(ClientSession, base_url="https://kahoot.it")
 
