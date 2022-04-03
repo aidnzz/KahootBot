@@ -4,11 +4,12 @@ __all__ = (
     'CometD',
 )
 
+import logging
+
 from . import constants
 from .typing import UrlOrStr
 from .exceptions import HandshakeError
 from .models import HandshakeResponse
-
 from .transports import Transport, WebSocketTransport
 
 from functools import wraps
@@ -21,6 +22,8 @@ from typing import (
     TypeVar,
     Type
 )
+
+log = logging.logging(__name__)
 
 class CometD(AbstractAsyncContextManager):
     """
@@ -50,6 +53,7 @@ class CometD(AbstractAsyncContextManager):
     async def handshake(self) -> None:
         response: HandshakeResponse = await self._transport.handshake()
         self._transport.client_id = response["client_id"]
+        log.info("Handshake completed")
 
     @property
     def closed(self) -> bool:

@@ -16,7 +16,7 @@ SUPPORTED_CONNECTION_TYPES: Final[tuple[ConnectionType]] = (
 )
 
 DEFAULT_CONNECTION_TYPE: Final[ConnectionType] = ConnectionType.WEBSOCKET
-
+# Usual timeout
 DEFAULT_TIMEOUT: Final[int] = 60_000
-
+# Version 1.0
 VERSION: Final[float] = 1.0
