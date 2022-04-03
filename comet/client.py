@@ -5,14 +5,19 @@ __all__ = (
 )
 
 from . import constants
-
 from .typing import UrlOrStr
 from .transports import WebSocketTransport
 
 from functools import wraps
 from aiohttp import ClientSession, ClientWebSocketResponse
-from typing import Callable, Optional, TypeVar, Type
 from contextlib import AbstractAsyncContextManager, nullcontext
+
+from typing import (
+    Callable, 
+    Optional, 
+    TypeVar, 
+    Type
+)
 
 class CometD(AbstractAsyncContextManager):
     """
