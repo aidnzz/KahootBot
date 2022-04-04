@@ -27,7 +27,7 @@ KahootClient = partial(ClientSession, base_url="https://kahoot.it")
 T = TypeVar('T')
 
 def map_exceptions(*excs):
-    def inner(fn: Callable[..., T]) -> Callable[..., T]:
+    def inner(fn: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
         @wraps(fn)
         async def wrapper(*args, **kwargs) -> T:
             exceptions = tuple(map(itemgetter(0), excs))
