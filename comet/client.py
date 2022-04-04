@@ -8,8 +8,8 @@ import logging
 
 from . import constants
 from .typing import UrlOrStr
-from .exceptions import HandshakeError
 from .models import HandshakeResponse
+from .exceptions import HandshakeError
 from .transports import Transport, WebSocketTransport
 
 from functools import wraps
@@ -23,7 +23,7 @@ from typing import (
     Type
 )
 
-log = logging.logging(__name__)
+log = logging.getLogger(__name__)
 
 class CometD(AbstractAsyncContextManager):
     """
@@ -31,36 +31,41 @@ class CometD(AbstractAsyncContextManager):
     """
 
     __slots__ = (
+        '_client',
         '_transport',
     )
 
-    def __init__(self, transport: Transport) -> None:
+    def __init__(self, transport: Transport, *, client: Optional[ClientSession] = None) -> None:
         """ Requires transport to be connected """
         self._transport = transport
+        self._client: ClientSession | nullcontext = client or nullcontext(client)
 
     @classmethod
-    def from_socket(cls: Type['CometD'], socket: ClientWebSocketResponse) -> 'CometD':
-        return cls(WebSocketTransport(socket))
+    def from_socket(cls: Type['CometD'], socket: ClientWebSocketResponse, *, client: Optional[ClientSession] = None) -> 'CometD':
+        return cls(WebSocketTransport(socket), client=client)
 
     @classmethod
     async def connect(cls: Type['CometD'], url: UrlOrStr, *, client: Optional[ClientSession] = None, **kwargs) -> 'CometD':
-        """ Connect to cometd server via websocket  """
-        cm = nullcontext(client) if client else ClientSession() # Client manager
-        async with cm as client:
-            socket = await client.ws_connect(url, **kwargs)
+        """ Connect to Cometd server via websocket  """
+        http = client or ClientSession() # We need to retain http client
+        socket = await http.ws_connect(url, **kwargs)
+        if not client:
+            return cls.from_socket(socket, client=http)
         return cls.from_socket(socket)
 
     async def handshake(self) -> None:
         response: HandshakeResponse = await self._transport.handshake()
         self._transport.client_id = response["client_id"]
-        log.info("Handshake completed")
+        log.info("Handshake completed: client_id={0.client_id}, id={0.id}".format(self._transport))
 
     @property
     def closed(self) -> bool:
         return self._transport.closed
 
     async def close(self) -> None:
-        await self._transport.close()
+        # Close transport then close client if not null
+        async with self._client:
+            await self._transport.close()
 
     async def __aexit__(self, *_) -> None:
         await self.close()
