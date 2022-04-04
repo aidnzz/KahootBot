@@ -7,6 +7,7 @@ __all__ = (
 from comet.typing import UrlOrStr, Json
 from comet.exceptions import BayeuxError
 from comet.transports.abc import Transport
+from comet.transports.decorators import connection_required
 
 from comet.constants import (
     VERSION,
@@ -28,7 +29,7 @@ def bayeux_message(fn: Callable[..., Awaitable[Json]]) -> Callable[..., Awaitabl
     """ Sends request waits for response and checks for errors """
     @wraps(fn)
     async def wrapper(self: 'WebSocketTransport', *args, **kwargs) -> Json:
-        await fn(*args, **kwargs)
+        await fn(self, *args, **kwargs)
         data = await self._socket.recieve_json()
         # Increment id after complete request-response flow
         self.id += 1
@@ -36,6 +37,7 @@ def bayeux_message(fn: Callable[..., Awaitable[Json]]) -> Callable[..., Awaitabl
             raise BayeuxError(error)
         return data
     return wrapper
+
 
 @final
 class WebSocketTransport(Transport):
@@ -61,6 +63,7 @@ class WebSocketTransport(Transport):
         }])
 
     @bayeux_message
+    @connection_required
     async def connect(self) -> Json:
         await self._socket.send_json([{
             "id": self.id,
@@ -70,6 +73,7 @@ class WebSocketTransport(Transport):
         }])
 
     @bayeux_message
+    @connection_required
     async def disconnect(self) -> Json:
         await self._socket.send_json([{
             "id": self.id,
@@ -78,6 +82,7 @@ class WebSocketTransport(Transport):
         }])
 
     @bayeux_message
+    @connection_required
     async def subscribe(self, channel: str | list[str]) -> Json:
         await self._socket.send_json([{
             "channel": "/meta/subscribe",

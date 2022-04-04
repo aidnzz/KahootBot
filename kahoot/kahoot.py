@@ -58,7 +58,7 @@ class Kahoot(AbstractAsyncContextManager):
         async with KahootClient() as client:
             async with client.get(f"/reserve/session/{pin}") as r:
                 response: ReservationResponse = await r.json()
-            self.comet = await CometD.connect(f"/cometd/{pin}/", client=client)
+            self.comet = await CometD.ws_connect(f"/cometd/{pin}/", client=client)
 
     def on(self, event: str, handler: Optional[Handler] = None) -> Handler:
         def inner(fn: Handler) -> Handler:

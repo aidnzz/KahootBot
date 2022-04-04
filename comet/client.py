@@ -7,7 +7,7 @@ __all__ = (
 import logging
 
 from . import constants
-from .typing import UrlOrStr
+from .typing import UrlOrStr, Json
 from .models import HandshakeResponse
 from .exceptions import HandshakeError
 from .transports import Transport, WebSocketTransport
@@ -45,7 +45,7 @@ class CometD(AbstractAsyncContextManager):
         return cls(WebSocketTransport(socket), client=client)
 
     @classmethod
-    async def connect(cls: Type['CometD'], url: UrlOrStr, *, client: Optional[ClientSession] = None, **kwargs) -> 'CometD':
+    async def ws_connect(cls: Type['CometD'], url: UrlOrStr, *, client: Optional[ClientSession] = None, **kwargs) -> 'CometD':
         """ Connect to Cometd server via websocket  """
         http = client or ClientSession() # We need to retain http client
         socket = await http.ws_connect(url, **kwargs)
@@ -55,8 +55,18 @@ class CometD(AbstractAsyncContextManager):
 
     async def handshake(self) -> None:
         response: HandshakeResponse = await self._transport.handshake()
-        self._transport.client_id = response["client_id"]
+        self._transport.client_id = response.get("client_id")
         log.info("Handshake completed: client_id={0.client_id}, id={0.id}".format(self._transport))
+
+    async def connect(self) -> None:
+        await self._transport.connect()
+
+    async def disconnect(self) -> None:
+        await self._transport.disconnect()
+
+    async def publish(self, channel: str | list[str], data: Json) -> None:
+        response: PublishResponse = await self._transport.publish(channel, data)
+        logging.info("Published to server")
 
     @property
     def closed(self) -> bool:

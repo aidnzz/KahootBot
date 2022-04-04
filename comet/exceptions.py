@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
 __all__ = (
-    'BayeaxError',
+    'BayeuxError',
+    'BayeuxConnectionError',
     'HandshakeError',
 )
 
 class BayeuxError(Exception):
     pass
+
+
+class BayeuxConnectionError(Exception):
+    pass
+
 
 class HandshakeError(BayeuxError):
     pass
