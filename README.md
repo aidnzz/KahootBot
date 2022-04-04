@@ -2,7 +2,7 @@
 
 A modern, easy to use asynchronous wrapper for Kahoot's API in python.
 
-![python](https://img.shields.io/badge/python-v3.10-blue) 
+![python](https://img.shields.io/badge/python-3.10-blue) 
 ![Twitter Follow](https://img.shields.io/twitter/follow/aidnzz?style=social)
 
 ### Progress
