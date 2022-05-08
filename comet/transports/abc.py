@@ -10,7 +10,6 @@ from comet.constants import ConnectionType
 from abc import ABC, abstractmethod
 
 
-
 class Transport(ABC):
     @property
     @abstractmethod
